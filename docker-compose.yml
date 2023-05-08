@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: password
+  webserver:
+    build: ./nginx
+    ports:
+      - "80:80"
+    links:
+      - app:app
+  app:
+    build: .
+    command: bin/rails server --port 3000 --binding 0.0.0.0
+    volumes:
+      - .:/store_manager
+    ports:
+      - "3000:3000"
+    tty: true
+    links:
+      - db
+    environment:
+      - REDIS_URL_SIDEKIQ=redis://redis:6379
+  redis:
+    image: redis:6.2-alpine
+    command: redis-server
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis:/data'
+  sidekiq:
+    depends_on:
+      - 'db'
+      - 'redis'
+    build: .
+    command: 'bundle exec sidekiq -C config/sidekiq.yml'
+    volumes:
+      - '.:/store_manager'
+    environment:
+      - REDIS_URL_SIDEKIQ=redis://redis:6379
+volumes:
+  db:
+  redis:
