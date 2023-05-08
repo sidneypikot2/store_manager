@@ -71,6 +71,8 @@ group :test do
   gem "webdrivers"
 end
 
+gem "tailwindcss-rails", "~> 2.0"
+gem 'kaminari'
 gem "sidekiq", "~> 7.0"
 gem 'shrine', '~> 3.3'
 gem "image_processing", "~> 1.0"

@@ -1,0 +1,33 @@
+<div class="">
+  <h1 class="font-bold text-2xl tracking-wide py-4"><%= title %></h1>
+  <%= form_with(model: product, class: "contents", id: "product_form") do |form| %>
+    <div class="grid gap-6 mb-6 md:grid-rows-3">
+      <div class="text-red-700">
+        <div>
+          <%= form.label :sku, "SKU", class: input_label_class(product.errors.include?("sku")) %>
+          <%= form.text_field :sku, class: input_text_class(product.errors.include?("sku")) %>
+          <%= display_error_message(product, "sku") %>
+        </div>
+      </div>
+      <div>
+        <%= form.label :name, "Product name", class: input_label_class(product.errors.include?("name")) %>
+        <%= form.text_field :name, class: input_text_class(product.errors.include?("name")) %>
+        <%= display_error_message(product, "name") %>
+      </div>
+      <div>
+        <%= form.label :price, "Price", class: input_label_class(product.errors.include?("price")) %>
+        <%= form.number_field :price, class: input_text_class(product.errors.include?("price")) %>
+        <%= display_error_message(product, "price") %>
+      </div>
+      <div>
+        <%= form.label :stock_count, "Stock Count", class: input_label_class(product.errors.include?("stock_count")) %>
+        <%= form.number_field :stock_count, class: input_text_class(product.errors.include?("stock_count")) %>
+        <%= display_error_message(product, "stock_count") %>
+      </div>
+    </div>
+    <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600 justify-end">
+      <button type="submit" form="product_form" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center light:bg-blue-600 light:hover:bg-blue-700 light:focus:ring-blue-800" >Submit</button>
+      <%= link_to "Cancel", products_url, class: "text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600" %>
+    </div>
+  <% end %>
+</div>
