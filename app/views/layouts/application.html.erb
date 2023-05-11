@@ -11,8 +11,11 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body style="height: 100vh;padding: 10px">
-    <main class="container mx-auto h-full" >
+  <body style="height: 100vh;">
+    <%= render '/components/navbar' %>
+    <main class="container mx-auto h-full"  style="padding: 10px" >
+      <p class="notice"><%= notice %></p>
+      <p class="alert"><%= alert %></p>
       <%= yield %>
     </main>
   </body>
