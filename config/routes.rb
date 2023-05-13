@@ -1,7 +1,8 @@
 Rails.application.routes.draw do
   devise_for :users
   resources :products, only: %i[index show]
-  resources :carts, only: %i[create index]
+  resources :carts, only: %i[create index destroy]
+  resources :checkouts, only: %i[create index show]
 
   namespace :admin do
     resources :products
