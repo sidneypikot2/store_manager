@@ -1,0 +1,29 @@
+<li class="flex py-6">
+  <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+    <img src=<%= cart.product.image_url %> alt="Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt." class="h-full w-full object-cover object-center">
+  </div>
+  <div class="ml-4 flex flex-1 flex-col">
+    <div>
+      <div class="flex justify-between text-base font-medium text-gray-900">
+        <div>
+        <h3>
+          <a href="#"><%= cart.product.name %></a>
+        </h3>
+        </div>
+        <div>
+        <% if cart.discounted_total %>
+          <p class="ml-4 text-red-600">$<%= cart.discounted_total %></p>
+        <% end %>
+        <span class="<%= cart.discounted_total.present? ? 'ml-4 line-through' : "ml-4" %>">$<%= cart.sub_total %></span>
+        </div>
+      </div>
+      <%# <p class="mt-1 text-sm text-gray-500">Salmon</p> %>
+    </div>
+    <div class="flex flex-1 items-end justify-between text-sm">
+      <p class="text-gray-500">Qty <%= cart.purchase_count %></p>
+      <div class="flex">
+        <%= button_to "Remove", cart, method: :delete %>
+      </div>
+    </div>
+  </div>
+</li>

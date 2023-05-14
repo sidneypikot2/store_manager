@@ -1,0 +1,55 @@
+  <div class="fixed inset-0 bg-white"></div>
+  <div class="fixed inset-0 overflow-hidden">
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 w-full justify-center">
+        <div class="pointer-events-auto w-screen max-w-md">
+          <div class="flex h-full flex-col bg-white shadow-xl">
+            <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+              <div class="flex items-start justify-between">
+                <h2 class="text-lg font-medium text-gray-900" id="slide-over-title">Shopping cart</h2>
+                <p class="notice"><%= notice %></p>
+                <p class="alert" style="color: red"><%= alert %></p>
+              </div>
+              <div class='mt-8 flex justify-center text-base font-medium text-gray-900 <%= !@carts.present? ? "h-full" : "" %>' style="align-items: center">
+                <div class="flow-root">
+                  <ul role="list" class="-my-6 divide-y divide-gray-200">
+                    <% if @carts.present? %>
+                      <%= render @carts %>
+                    <% else %>
+                      <p>Your cart is empty.</p>
+                      <br/>
+                      <%= button_to root_path, method: :get, class: "font-medium text-indigo-600 hover:text-indigo-500" do %>
+                        Continue Shopping
+                        <span aria-hidden="true"> &rarr;</span>
+                      <% end%>
+                    <% end %>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="border-t border-gray-200 px-4 py-6 sm:px-6">
+              <div class="flex justify-between text-base font-medium text-gray-900">
+                <p>Subtotal</p>
+                <p>$<%= @total_amount %></p>
+              </div>
+              <p class="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
+              <%= form_with(model: @checkout, url: checkouts_url, class: "contents", id: "checkout_form") do |form| %>
+                <div class="mt-6">
+                  <button type="submit" form="checkout_form" class="w-full flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700" >Checkout</button>
+                </div>
+              <%end %>
+              <div class="mt-6 flex justify-center text-center text-sm text-gray-500">
+                <p>
+                  or&nbsp;
+                  <%= button_to root_path, method: :get, class: "font-medium text-indigo-600 hover:text-indigo-500" do %>
+                    Continue Shopping
+                    <span aria-hidden="true"> &rarr;</span>
+                  <% end%>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
