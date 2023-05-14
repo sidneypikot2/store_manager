@@ -1,33 +1,124 @@
-<div class="">
-  <h1 class="font-bold text-2xl tracking-wide py-4"><%= title %></h1>
-  <%= form_with(model: product, url: admin_product_url, class: "contents", id: "product_form") do |form| %>
-    <div class="grid gap-6 mb-6 md:grid-rows-3">
-      <div class="text-red-700">
+<div class="grid md:grid-cols-2">
+  <div>
+    <h1 class="font-bold text-2xl tracking-wide py-4"><%= title %></h1>
+    <%= form_with(model: [:admin,product], class: "contents", id: "product_form") do |form| %>
+      <div class="grid gap-6 mb-6 md:grid-rows-3" style="width: 50%;padding: 10px;">
+        <div class="text-red-700">
+          <div>
+            <%= form.label :sku, "SKU", class: input_label_class(product.errors.include?("sku")) %>
+            <%= form.text_field :sku, class: input_text_class(product.errors.include?("sku")) %>
+            <%= display_error_message(product, "sku") %>
+          </div>
+        </div>
         <div>
-          <%= form.label :sku, "SKU", class: input_label_class(product.errors.include?("sku")) %>
-          <%= form.text_field :sku, class: input_text_class(product.errors.include?("sku")) %>
-          <%= display_error_message(product, "sku") %>
+          <%= form.label :name, "Product name", class: input_label_class(product.errors.include?("name")) %>
+          <%= form.text_field :name, class: input_text_class(product.errors.include?("name")) %>
+          <%= display_error_message(product, "name") %>
+        </div>
+        <div>
+          <%= form.label :price, "Price", class: input_label_class(product.errors.include?("price")) %>
+          <%= form.number_field :price, step: :any, class: input_text_class(product.errors.include?("price")) %>
+          <%= display_error_message(product, "price") %>
+        </div>
+        <div>
+          <%= form.label :stock_count, "Stock Count", class: input_label_class(product.errors.include?("stock_count")) %>
+          <%= form.number_field :stock_count, class: input_text_class(product.errors.include?("stock_count")) %>
+          <%= display_error_message(product, "stock_count") %>
         </div>
       </div>
-      <div>
-        <%= form.label :name, "Product name", class: input_label_class(product.errors.include?("name")) %>
-        <%= form.text_field :name, class: input_text_class(product.errors.include?("name")) %>
-        <%= display_error_message(product, "name") %>
+      <div class="relative flex gap-x-3">
+        <div class="flex h-6 items-center">
+          <%= form.check_box :with_promotion, checked: product&.promotion&.is_active? || product.with_promotion == "1", onclick: "handleChangeWithPromotion(this)", class: "h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" %>
+        </div>
+        <div class="text-sm leading-6">
+          <label for="offers" class="font-medium text-gray-900">Add Promotion</label>
+        </div>
       </div>
-      <div>
-        <%= form.label :price, "Price", class: input_label_class(product.errors.include?("price")) %>
-        <%= form.number_field :price, class: input_text_class(product.errors.include?("price")) %>
-        <%= display_error_message(product, "price") %>
+      <div class=<%= product&.promotion.new_record? || product.with_promotion == "0" ? "hidden" : "" %> id="promotion_container">
+        <%= form.fields_for :promotion do |promotion_form| %>
+          <h1 class="font-bold text-2xl tracking-wide py-4">Add Promotion(Fill only one BxTy or Discount)</h1>
+            <div class="grid" style="width: 50%;padding: 10px;">
+              <div class="text-red-700" style="margin-bottom: 20px;">
+                <div>
+                  <%= promotion_form.label :name, "Name", class: input_label_class(product.promotion.errors.include?("name")) %>
+                  <%= promotion_form.text_field :name, class: input_text_class(product.promotion.errors.include?("name")) %>
+                  <%= display_error_message(product.promotion, "name") %>
+                </div>
+              </div>
+              <fieldset>
+                <legend class="font-bold text-lg tracking-wide">Choose type of Promotion</legend>
+                <p class="text-sm leading-6 text-gray-600">Can only choose one</p>
+                <div class="mt-6 space-y-6">
+                  <div class="flex items-center gap-x-3">
+                    <%= radio_button_tag 'product[promotion_type]', 'buy_x_discount', (product.promotion_type == "buy_x_discount"), onchange: "handleChange(this);", class: "h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600" %>
+                    <label for="buy-x-discount" class="block text-sm font-medium leading-6 text-gray-900">Discount Promotion</label>
+                  </div>
+                  <div class="flex items-center gap-x-3">
+                    <%= radio_button_tag 'product[promotion_type]', 'buy_x_take_y', (product.promotion_type == "buy_x_take_y"), onchange: "handleChange(this);", class: "h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600" %>
+                    <label for="push-email" class="block text-sm font-medium leading-6 text-gray-900">Buy X Take Y Promotion</label>
+                  </div>
+              </fieldset>
+              <div id="buy_x_take_y_container" class=<%= product.promotion_type == "buy_x_discount" || product.promotion_type.nil? ? "hidden" : "" %>>
+                <h1 class="font-bold text-lg tracking-wide py-4">Buy X Take Y Promotion</h1>
+                <%= promotion_form.fields_for :buy_x_take_y do |buy_x_take_y_form| %>
+                  <div class="text-red-700">
+                    <%= buy_x_take_y_form.label :buy_x_condition, "Promotion Condition(buy x product for promotion to take effect)", class: input_label_class(product.promotion.buy_x_take_y.errors.include?("buy_x_condition")) %>
+                    <%= buy_x_take_y_form.number_field :buy_x_condition, class: input_text_class(product.promotion.buy_x_take_y.errors.include?("buy_x_condition")) %>
+                  </div>
+                  <div class="text-red-700">
+                    <%= buy_x_take_y_form.label :product_id, "Take Y Product", class: input_label_class(product.promotion.buy_x_take_y.errors.include?("product_id")) %>
+                    <%= buy_x_take_y_form.select(:product_id, options_for_select(Product.all.map { |product| [product.name, product.id] }, (product&.promotion&.buy_x_take_y&.product_id || product.id)), {include_blank: "Select a product"}, { class: input_text_class(product.promotion.buy_x_take_y.errors.include?("product_id")) }) %>
+                  </div>
+                <% end %>
+              </div>
+              <div id="buy_x_discount_container" class=<%= product.promotion_type == "buy_x_take_y" || product.promotion_type.nil? ? "hidden" : "" %>>
+                <h1 class="font-bold text-lg tracking-wide py-4">Discount Promotion</h1>
+                <%= promotion_form.fields_for :buy_x_discount do |buy_x_discount_form| %>
+                  <div class="text-red-700">
+                    <%= buy_x_discount_form.label :buy_x_condition, "Promotion Condition(buy x product for promotion to take effect)", class: input_label_class(product.promotion.buy_x_discount.errors.include?("buy_x_condition")) %>
+                    <%= buy_x_discount_form.number_field :buy_x_condition, class: input_text_class(product.promotion.buy_x_discount.errors.include?("buy_x_condition")) %>
+                  </div>
+                  <div class="text-red-700">
+                    <%= buy_x_discount_form.label :discount_price, "Discounted Price", class: input_label_class(product.promotion.buy_x_discount.errors.include?("discount_price")) %>
+                    <%= buy_x_discount_form.number_field :discount_price, step: :any, class: input_text_class(product.promotion.buy_x_discount.errors.include?("discount_price")) %>
+                  </div>
+                <% end %>
+              </div>
+          </div>
+        <% end %>
       </div>
-      <div>
-        <%= form.label :stock_count, "Stock Count", class: input_label_class(product.errors.include?("stock_count")) %>
-        <%= form.number_field :stock_count, class: input_text_class(product.errors.include?("stock_count")) %>
-        <%= display_error_message(product, "stock_count") %>
+      <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600 justify-end">
+        <button type="submit" form="product_form" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center light:bg-blue-600 light:hover:bg-blue-700 light:focus:ring-blue-800" >Submit</button>
+        <%= link_to "Cancel", admin_products_url, class: "text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600" %>
       </div>
-    </div>
-    <div class="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600 justify-end">
-      <button type="submit" form="product_form" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center light:bg-blue-600 light:hover:bg-blue-700 light:focus:ring-blue-800" >Submit</button>
-      <%= link_to "Cancel", admin_products_url, class: "text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600" %>
-    </div>
-  <% end %>
+    <% end %>
+  </div>
 </div>
+
+<script>
+function handleChange(src) {
+  var buy_x_discount_container = document.getElementById("buy_x_discount_container")
+  var buy_x_take_y_container = document.getElementById("buy_x_take_y_container")
+  console.log(src.value)
+  if(src.value == "buy_x_take_y") {
+    buy_x_discount_container.classList.add("hidden")
+    buy_x_take_y_container.classList.remove("hidden")
+  } else if(src.value == "buy_x_discount") {
+    buy_x_discount_container.classList.remove("hidden")
+    buy_x_take_y_container.classList.add("hidden")
+  }
+}
+
+function handleChangeWithPromotion(src) {
+  var promotion_container = document.getElementById("promotion_container")
+  if (src.checked) {
+    promotion_container.classList.remove("hidden")
+  } else {
+    promotion_container.classList.add("hidden")
+  }
+}
+ window.onload = function(e) {
+    handleChange(e)
+    handleChangeWithPromotion(e)
+};
+</script>
